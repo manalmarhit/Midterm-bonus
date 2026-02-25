@@ -22,11 +22,11 @@
         $username = $_POST["username"];
         $password = $_POST["password"];
 
-        $sql = "SELECT password FROM Users WHERE username='$username'";
+        $sql = "SELECT * FROM Users WHERE username='$username'";
         $result = $conn->query($sql);
 
         if($result->num_rows > 0){
-            $row = $result->fetch_assoc(); //we need to first extract the row 
+            $row = $result->fetch_assoc(); //we need to first extract the row that matches the username entered by the user
             $storedHash = $row["password"]; //we get the password from that row
 
 
@@ -36,7 +36,7 @@
                 $message = "Login Unsuccessful";
             }
 
-            
+
         } else {
             $message = "Login Unsuccessful";
         }
