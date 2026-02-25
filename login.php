@@ -1,47 +1,38 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Login</title>
-    </head>
-    <body>
+<?php
+$conn = new mysqli("localhost", "root", "", "SocialMediaDB");
+$message = "";
 
-    <h2>Login Page</h2>
+if ($conn->connect_error) {
+    die("Database connection failed: " . $conn->connect_error);
+}
 
-    <form method ="POST">
-        Username: <input type ="text" name ="username" required><br><br>
-        Password: <input type ="password" name ="password" required><br><br>
-        <button type="submit">Login</button>
-    </form>
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    <?php
-        $conn = new mysqli("localhost","root","","SocialMediaDB");
+    $username = $_POST["username"];
+    $password = $_POST["password"];
 
-        $message ="";
+    // Get stored hash for this username
+    $sql = "SELECT password FROM Users WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        if($_SERVER["REQUEST_METHOD"]=="POST"){
+    if ($result->num_rows === 1) {
+        $row = $result->fetch_assoc();
+        $storedHash = $row["password"];
 
-            $username =$_POST["username"];
-            $password =$_POST["password"];
-
-            $sql = "SELECT * FROM Users where 
-            username='$username' and password ='$password'";
-
-            $result = $conn->query($sql);
-
-            if($result->num_rows>0){
-                $message ="Login Successful";
-
-            }
-            else
-                $message ="Login Unsuccessful";
+        if (password_verify($password, $storedHash)) {
+            $message = "Login Successful";
+        } else {
+            $message = "Login Unsuccessful";
         }
+    } else {
+        $message = "Login Unsuccessful";
+    }
 
-    ?>
+    $stmt->close();
+}
 
-
-    <p style="color:red;">
-        <?php echo $message; ?>
-    </p>
-
-</body>
-</html>
+$conn->close();
+?>
