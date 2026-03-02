@@ -1,0 +1,15 @@
+CREATE VIEW student_course_details AS
+SELECT 
+    students.student_id,
+    students.student_name,
+    students.major,
+    courses.course_id,
+    courses.course_name,
+    courses.credits,
+    enrollments.semester,
+    enrollments.grade
+FROM students
+INNER JOIN enrollments
+    ON students.student_id = enrollments.student_id
+INNER JOIN courses
+    ON enrollments.course_id = courses.course_id;
